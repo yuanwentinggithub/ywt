@@ -1,0 +1,43 @@
+---
+- name: Creating the storage-api service and endpoint
+  kolla_toolbox:
+    module_name: "kolla_keystone_service"
+    module_args:
+      service_name: "{{ item.name }}"
+      service_type: "{{ item.service_type }}"
+      description: "{{ item.description }}"
+      endpoint_region: "{{ openstack_region_name }}"
+      url: "{{ item.url }}"
+      interface: "{{ item.interface }}"
+      region_name: "{{ openstack_region_name }}"
+      auth: "{{ '{{ openstack_storage_api_auth }}' }}"
+    module_extra_vars:
+      openstack_storage_api_auth: "{{ openstack_storage_api_auth }}"
+  register: storage-api_endpoint
+  until:  storage-api_endpoint|success
+  retries: 10
+  delay: 5
+  run_once: True
+  with_items:
+    - {'name': 'storage-api', 'service_type': 'storage-api', 'interface': 'admin','url': '{{ storage_api_admin_endpoint }}', 'description': 'storage-apiservice'}
+    - {'name': 'storage-api', 'service_type': 'storage-api', 'interface': 'internal', 'url': '{{ storage_api_internal_endpoin }}', 'description': 'storage-apiservice'}
+    - {'name': 'storage-api', 'service_type': 'storage-api', 'interface': 'public', 'url': '{{ storage_api_public_endpoint }}', 'description': 'storage-apiservice'}
+
+- name: Creating the storage-api project, user, and role
+  kolla_toolbox:
+    module_name: "kolla_keystone_user"
+    module_args:
+      project: "service"
+      user: "{{ storage_api_keystone_user }}"
+      password: "{{ storage_api_keystone_password }}"
+      role: "admin"
+      region_name: "{{ openstack_region_name }}"
+      auth: "{{ '{{ openstack_storage_api_auth }}' }}"
+    module_extra_vars:
+      openstack_storage_api_auth: "{{ openstack_storage_api_auth }}"
+  register: storage_api_user
+  until: storage_api_user|success
+  retries: 10
+  delay: 5
+  run_once: True
+

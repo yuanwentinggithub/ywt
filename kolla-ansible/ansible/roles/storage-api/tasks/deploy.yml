@@ -1,0 +1,7 @@
+---
+- include: register.yml
+  when: inventory_hostname in groups['storage-api']
+
+- include: config.yml
+
+

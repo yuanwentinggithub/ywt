@@ -1,0 +1,61 @@
+FROM {{ namespace }}/{{ image_prefix }}openstack-base:{{ tag }}
+MAINTAINER {{ maintainer }}
+
+{% block storage_api_header %}{% endblock %}
+
+{% import "macros.j2" as macros with context %}
+
+{% if install_type == 'binary' %}
+    {% if base_distro in ['centos', 'openstack-base', 'rhel'] %}
+
+        {% set storage_api_packages = [
+                'python-rados',
+                'ceph',
+                'storage-api'
+        ] %}
+
+    {% elif base_distro in ['ubuntu'] %}
+
+        {% set storage_api_packages = [
+                'python-rados',
+                'ceph',
+                'storage-api'
+        ] %}
+
+    {% endif %}
+
+COPY *.repo /etc/yum.repos.d/
+
+{{ macros.install_packages(storage_api_packages | customizable("packages")) }}
+
+{% elif install_type == 'source' %}
+    {% if base_distro in ['centos', 'openstack-base', 'rhel'] %}
+
+        {% set storage_api_packages = [
+                'python-rados',
+                'ceph',
+                'storage-api'
+        ] %}
+
+    {% elif base_distro in ['ubuntu', 'debian'] %}
+
+        {% set storage_api_packages = [
+                'python-rados',
+                'ceph',
+                'storage-api'
+        ] %}
+
+    {% endif %}
+
+COPY *.repo /etc/yum.repos.d/
+
+{{ macros.install_packages(storage_api_packages | customizable("packages")) }}
+
+{% endif %}
+
+RUN touch /tmp/ywtinfo.txt
+
+{% block storage_api_footer %}{% endblock %}
+
+
+

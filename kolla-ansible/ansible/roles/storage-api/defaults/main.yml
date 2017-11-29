@@ -1,0 +1,22 @@
+---
+project_name: "storage-api"
+
+#nova_services:
+#  nova-libvirt:
+
+
+
+
+####################
+## OpenStack
+####################
+storage_api_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ storage_api_port }}/v1.0/%(tenant_id)s"
+storage_api_internal_endpoin: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ storage_api_port }}/v1.0/%(tenant_id)s"
+storage_api_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ storage_api_port }}/v1.0/%(tenant_id)s"
+
+openstack_storage_api_auth: "{{ openstack_auth }}"
+
+
+
+
+

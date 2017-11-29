@@ -1,0 +1,34 @@
+FROM {{ namespace }}/{{ image_prefix }}openstack-base:{{ tag }}
+MAINTAINER {{ maintainer }}
+
+{% block watcher_base_header %}{% endblock %}
+
+{% import "macros.j2" as macros with context %}
+
+{{ macros.configure_user(name='watcher') }}
+
+{% if install_type == 'binary' %}
+    {% if base_distro in ['centos', 'oraclelinux', 'rhel'] %}
+        {% set watcher_base_packages = ['openstack-watcher-common'] %}
+    {% elif base_distro in ['ubuntu'] %}
+        {% set watcher_base_packages = ['watcher-common'] %}
+    {% endif %}
+{{ macros.install_packages(watcher_base_packages | customizable("packages")) }}
+
+{% elif install_type == 'source' %}
+
+ADD watcher-base-archive /watcher-base-source
+RUN ln -s watcher-base-source/* watcher \
+    && /var/lib/kolla/venv/bin/pip --no-cache-dir install --upgrade -c requirements/upper-constraints.txt /watcher \
+    && mkdir -p /etc/watcher \
+    && cp -r /watcher/etc/watcher/* /etc/watcher/ \
+    && chown -R watcher: /etc/watcher
+
+{% endif %}
+
+COPY extend_start.sh /usr/local/bin/kolla_extend_start
+
+RUN touch /usr/local/bin/kolla_watcher_extend_start \
+    && chmod 755 /usr/local/bin/kolla_extend_start /usr/local/bin/kolla_watcher_extend_start
+
+{% block watcher_base_footer %}{% endblock %}

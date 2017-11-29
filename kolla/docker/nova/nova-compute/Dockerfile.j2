@@ -1,0 +1,105 @@
+FROM {{ namespace }}/{{ image_prefix }}nova-base:{{ tag }}
+MAINTAINER {{ maintainer }}
+
+{% block nova_compute_header %}{% endblock %}
+
+{% import "macros.j2" as macros with context %}
+
+{% if install_type == 'binary' %}
+    {% if base_distro in ['centos', 'oraclelinux', 'rhel'] %}
+
+        {% set nova_compute_packages = [
+            'device-mapper-multipath',
+            'openstack-nova-compute',
+            'openvswitch',
+            'sysfsutils',
+            'ceph-common',
+            'genisoimage',
+            'iscsi-initiator-utils',
+            'nfs-utils',
+            'targetcli',
+            'python-rtslib'
+        ] %}
+
+{{ macros.install_packages(nova_compute_packages | customizable("packages")) }}
+
+    {% elif base_distro in ['ubuntu'] %}
+
+        # ironic as workaround https://bugs.launchpad.net/packstack/+bug/1430388
+        {% set nova_compute_packages = [
+            'nova-compute',
+            'openvswitch-switch',
+            'sysfsutils',
+            'ceph-common',
+            'ironic-common',
+            'python-ironicclient',
+            'genisoimage',
+            'multipath-tools',
+            'nfs-common',
+            'open-iscsi',
+            'targetcli',
+            'python-rtslib'
+        ] %}
+
+{{ macros.install_packages(nova_compute_packages | customizable("packages")) }}
+
+RUN rm -f /etc/nova/nova-compute.conf
+
+    {% endif %}
+{% elif install_type == 'source' %}
+    {% if base_distro in ['centos', 'oraclelinux', 'rhel'] %}
+
+        {% set nova_compute_packages = [
+            'device-mapper-multipath',
+            'dosfstools',
+            'libvirt-python',
+            'libosinfo',
+            'openvswitch',
+            'qemu-img',
+            'sysfsutils',
+            'ceph-common',
+            'genisoimage',
+            'iscsi-initiator-utils',
+            'nfs-utils',
+            'targetcli',
+            'python-rtslib'
+        ] %}
+
+    {% elif base_distro in ['ubuntu', 'debian'] %}
+
+        {% set nova_compute_packages = [
+            'dosfstools',
+            'libosinfo-bin',
+            'qemu-utils',
+            'ceph-common',
+            'genisoimage',
+            'multipath-tools',
+            'nfs-common',
+            'open-iscsi',
+            'targetcli',
+            'python-libvirt',
+            'python-rtslib'
+        ] %}
+
+RUN mkdir -p /etc/ceph
+
+    {% endif %}
+
+{{ macros.install_packages(nova_compute_packages | customizable("packages")) }}
+
+{% set nova_compute_pip_packages = [] %}
+
+{{ macros.install_pip(nova_compute_pip_packages | customizable("pip_packages")) }}
+
+{% endif %}
+
+COPY extend_start.sh /usr/local/bin/kolla_nova_extend_start
+RUN chmod 755 /usr/local/bin/kolla_nova_extend_start \
+    && rm -f /etc/machine-id
+
+ENV PATH $PATH:/lib/udev
+
+{% block nova_compute_footer %}{% endblock %}
+{% block footer %}{% endblock %}
+
+USER nova

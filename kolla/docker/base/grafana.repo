@@ -1,0 +1,5 @@
+[grafana]
+name=grafana
+baseurl=http://172.16.134.9/grafana_stable/
+gpgcheck=0
+enabled=1

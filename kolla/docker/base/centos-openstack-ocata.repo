@@ -1,0 +1,5 @@
+[openstack-ocata]
+name=ocata
+baseurl=http://172.30.120.147/centos/7/cloud/x86_64/openstack-ocata/
+gpgcheck=0
+enabled=1

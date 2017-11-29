@@ -1,0 +1,11 @@
+[percona-noarch]
+name=percona-noarch
+baseurl=http://172.16.134.9/percona/percona-release-noarch/
+gpgcheck=0
+enabled=1
+
+[percona-x86]
+name=percona-x86
+baseurl=http://172.16.134.9/percona/percona-release-x86_64/
+gpgcheck=0
+enabled=1

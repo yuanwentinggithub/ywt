@@ -1,0 +1,23 @@
+FROM {{ namespace }}/{{ image_prefix }}neutron-base:{{ tag }}
+MAINTAINER {{ maintainer }}
+
+{% block neutron_l3_agent_header %}{% endblock %}
+
+{% import "macros.j2" as macros with context %}
+
+{% if install_type == 'binary' %}
+    {% if base_distro in ['ubuntu', 'debian'] %}
+
+        {% set neutron_l3_agent_packages = [
+            'neutron-l3-agent'
+        ] %}
+
+    {% endif %}
+{% endif %}
+
+{{ macros.install_packages(neutron_l3_agent_packages | customizable("packages")) }}
+
+{% block neutron_l3_agent_footer %}{% endblock %}
+{% block footer %}{% endblock %}
+
+USER neutron

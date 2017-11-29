@@ -1,0 +1,5 @@
+[kibana]
+name=kibana
+baseurl=http://172.16.134.9/kibana-4.6/
+gpgcheck=0
+enabled=1

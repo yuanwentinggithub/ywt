@@ -1,0 +1,28 @@
+FROM {{ namespace }}/{{ image_prefix }}openstack-base:{{ tag }}
+MAINTAINER {{ maintainer }}
+
+{% block vmtp_header %}{% endblock %}
+
+{% import "macros.j2" as macros with context %}
+
+{{ macros.configure_user(name='vmtp') }}
+
+{% if install_type == 'binary' %}
+
+RUN echo '{{ install_type }} not yet available for {{ base_distro }}' \
+    && /bin/false
+
+{% elif install_type == 'source' %}
+
+RUN pip install vmtp
+
+{% endif %}
+
+COPY vmtp_sudoers /etc/sudoers.d/kolla_vmtp_sudoers
+RUN chmod 750 /etc/sudoers.d \
+    && chmod 440 /etc/sudoers.d/kolla_vmtp_sudoers
+
+{% block vmtp_footer %}{% endblock %}
+{% block footer %}{% endblock %}
+
+USER vmtp

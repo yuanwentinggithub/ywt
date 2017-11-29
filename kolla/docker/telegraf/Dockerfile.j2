@@ -1,0 +1,23 @@
+FROM {{ namespace }}/{{ image_prefix }}base:{{ tag }}
+MAINTAINER {{ maintainer }}
+
+{% block telegraf_header %}{% endblock %}
+
+{% import "macros.j2" as macros with context %}
+
+{{ macros.configure_user(name='telegraf', homedir='/etc/telegraf') }}
+
+{% set telegraf_packages = ['telegraf'] %}
+{{ macros.install_packages(telegraf_packages | customizable("packages")) }}
+
+COPY telegraf_sudoers /etc/sudoers.d/kolla_telegraf_sudoers
+COPY extend_start.sh /usr/local/bin/kolla_extend_start
+
+RUN chmod 750 /etc/sudoers.d \
+    && chmod 440 /etc/sudoers.d/kolla_telegraf_sudoers \
+    && chmod 755 /usr/local/bin/kolla_extend_start
+
+{% block telegraf_footer %}{% endblock %}
+{% block footer %}{% endblock %}
+
+USER telegraf

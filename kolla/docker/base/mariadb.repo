@@ -1,0 +1,5 @@
+[mariadb]
+name=mariadb
+baseurl=http://172.16.134.9/mariadb/rpms/
+gpgcheck=0
+enabled=1

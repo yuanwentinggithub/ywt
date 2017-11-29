@@ -1,0 +1,5 @@
+[elasticsearch]
+name=elasticsearch
+baseurl=http://172.16.134.9/elasticsearch-2.x/
+gpgcheck=0
+enabled=1

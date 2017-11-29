@@ -1,0 +1,5 @@
+[zookeeper]
+name=zookeeper
+baseurl=http://172.16.134.9/iwienand-zookeeper-el7/00485659-zookeeper/
+gpgcheck=0
+enabled=1

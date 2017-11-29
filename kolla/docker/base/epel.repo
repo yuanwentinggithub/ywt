@@ -1,0 +1,5 @@
+[epel]
+name=epel
+baseurl=http://172.30.120.147/epel/7Server/x86_64/
+gpgcheck=0
+enabled=1
